@@ -27,7 +27,8 @@ export default class KolbService {
         return { error: 'No autorizado' }
       }
 
-      const id_usuario = payload.id
+      // corregido: usar el mismo campo que viene en el JWT ("id_usuario")
+      const id_usuario = payload.id_usuario
       const { respuestas } = data
 
       if (!respuestas || !Array.isArray(respuestas)) {
@@ -55,16 +56,20 @@ export default class KolbService {
         const pregunta = await PreguntaEstiloAprendizajes.find(id_pregunta)
         if (!pregunta) continue
 
-        const estilo = mapEstilo[pregunta.tipo_pregunta]
+        //  corregido: normalizar el tipo de pregunta
+        const estilo = mapEstilo[pregunta.tipo_pregunta.toUpperCase().trim()]
         if (estilo && typeof valor === 'number') {
           puntajes[estilo] += valor
         }
 
-        await ResultadoEstudiante.create({
-          id_test_ea_por_estudiantes: test.id_test_ea_por_estudiantes,
-          id_pregunta_estilo_aprendizajes: id_pregunta,
-          valor: String(valor),
-        })
+        // corregido: validar que valor exista antes de guardar
+        if (valor !== undefined && typeof valor === 'number') {
+          await ResultadoEstudiante.create({
+            id_test_ea_por_estudiantes: test.id_test_ea_por_estudiantes,
+            id_pregunta_estilo_aprendizajes: id_pregunta,
+            valor: String(valor),
+          })
+        }
       }
 
       const valoresEstilos: Record<string, number> = {
@@ -116,7 +121,8 @@ export default class KolbService {
         return { error: 'No autorizado' }
       }
 
-      const id_usuario = payload.id
+      //  corregido: usar id_usuario del payload
+      const id_usuario = payload.id_usuario
 
       const test = await TestPorEstudiantes.query()
         .where('id_usuario', id_usuario)
