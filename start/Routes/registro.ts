@@ -7,46 +7,38 @@ import KolbController from '../../app/controller/kolbController.js'
 
 // Crear instancias de controladores y middleware
 const registro = new RegistroController()
-const intitucion = new InstitucionController()
+const institucion = new InstitucionController()
 const estudiante = new EstudiantesController()
 const authjwt = new Authjwt()
 const kolb = new KolbController()
 
-
-// RUTAS PARA INSTITUCIONES
-
-
-Router.post('/registrarInstitucion', registro.registrarInstitucion.bind(registro)) 
-Router.post('/loginInstitucion', registro.loginInstitucion.bind(registro))         
-Router.post('/cambiarContraseñaI', registro.cambiarPasswordInstitucion.bind(registro)) 
+//  RUTAS PARA INSTITUCIONES 
+Router.post('/registrarInstitucion', registro.registrarInstitucion.bind(registro))
+Router.post('/loginInstitucion', registro.loginInstitucion.bind(registro))
+Router.post('/cambiarContraseñaI', registro.cambiarPasswordInstitucion.bind(registro))
 
 Router.get('/perfilInstitucion', registro.perfilInstitucion.bind(registro))
-  .use(authjwt.handle.bind(authjwt)) 
+  .use(authjwt.handle.bind(authjwt))
 
-Router.get('/listaInstituciones', intitucion.listarInstituciones.bind(registro))
-
+Router.get('/listaInstituciones', institucion.listarInstituciones.bind(institucion))
 
 // RUTAS PARA ESTUDIANTES
-
-
-Router.post('/registrarEstudiante', registro.registrarEstudiante.bind(registro))    
-Router.post('/loginEstudiante', registro.loginEstudiante.bind(registro))             
-Router.post('/cambiarContraseñaE', registro.cambiarPassword.bind(registro))  
+Router.post('/registrarEstudiante', registro.registrarEstudiante.bind(registro))
+Router.post('/loginEstudiante', registro.loginEstudiante.bind(registro))
+Router.post('/cambiarContraseñaE', registro.cambiarPassword.bind(registro))
 
 Router.get('/perfilEstudiante', registro.perfilEstudiante.bind(registro))
-  .use(authjwt.handle.bind(authjwt)) 
+  .use(authjwt.handle.bind(authjwt))
 
-Router.get('/estudiantes/:id_institucion', estudiante.filtrarEstudiantes.bind(registro))
+Router.get('/estudiantes/:id_institucion', estudiante.filtrarEstudiantes.bind(estudiante))
+Router.post('/estudianteCSV', estudiante.subirCSV.bind(estudiante))
+Router.get('/listarPorInstituciones/:id', estudiante.listarPorInstitucion.bind(estudiante))
 
-Router.post('/estudianteCSV', estudiante.subirCSV.bind(estudiante))                    
-Router.get('/listarPorInstituciones/:id', estudiante.listarPorInstitucion.bind(registro))
-
-
-// RUTAS DE KOLB (test estilo de aprendizaje)
-
-
+//  RUTAS DE KOLB (Test de estilo de aprendizaje)
 Router.get('/kolb/preguntas', kolb.listarPreguntas.bind(kolb))
 
 Router.post('/kolb/guardarRespuestas', kolb.guardarRespuestas.bind(kolb))
+  .use(authjwt.handle.bind(authjwt)) // protegido con token
 
-Router.get('/kolb/obtenerResultado', kolb.obtenerResultado.bind(kolb)).use(authjwt.handle.bind(authjwt))
+Router.get('/kolb/obtenerResultado', kolb.obtenerResultado.bind(kolb))
+  .use(authjwt.handle.bind(authjwt)) // protegido con token
