@@ -1,50 +1,31 @@
-import type { HttpContext } from '@adonisjs/core/http'
 import KolbService from '../services/kolbService.js'
-import jwt from 'jsonwebtoken'
-
-const kolbService = new KolbService()
-const SECRET = process.env.jwt_secret || 'secret123'
+import type { HttpContext } from '@adonisjs/core/http'
 
 export default class KolbController {
+  private service = new KolbService()
 
+  // GET /kolb/preguntas
   async listarPreguntas({ response }: HttpContext) {
-    try {
-      const preguntas = await kolbService.listarPreguntas()
-      return response.json(preguntas)
-    } catch (error) {
-      return response.json({ error: 'Error al obtener preguntas' })
-    }
+    const result = await this.service.listarPreguntas()
+    return response.json(result)
   }
 
+  // POST /kolb/respuestas
   async guardarRespuestas({ request, response }: HttpContext) {
-    try {
-      const data = request.body()
-      const resultado = await kolbService.guardarRespuestas(data)
-      return response.json(resultado)
-    } catch (error) {
-      return response.json({ error: 'Error al guardar respuestas del test' })
-    }
+    const token = request.header('Authorization')?.replace('Bearer ', '')
+    if (!token) return response.unauthorized({ error: 'Token requerido' })
+
+    const data = request.only(['respuestas'])
+    const result = await this.service.guardarRespuestas(data, token)
+    return response.json(result)
   }
 
-async obtenerResultado({ request, response }: HttpContext) {
-    try {
-      const authHeader = request.header('Authorization')
+  // GET /kolb/resultado
+  async obtenerResultado({ request, response }: HttpContext) {
+    const token = request.header('Authorization')?.replace('Bearer ', '')
+    if (!token) return response.unauthorized({ error: 'Token requerido' })
 
-      if (!authHeader) {
-        return response.json({ error: 'Token obligatorio' })
-      }
-
-      const token = authHeader.replace('Bearer ', '').trim()
-      const decoded: any= jwt.verify(token, SECRET)
-
-      const id_usuario = decoded.id
-
-      const resultado = await kolbService.obtenerResultado(id_usuario)
-      return response.json(resultado)
-
-    } catch (error) {
-      return response.json({ error: 'Error al obtener resultado del test' })
-    }
+    const result = await this.service.obtenerResultado(token)
+    return response.json(result)
   }
-
 }
