@@ -15,7 +15,9 @@ export default class KolbController {
     const token = request.header('Authorization')?.replace('Bearer ', '')
     if (!token) return response.unauthorized({ error: 'Token requerido' })
 
-    const data = request.only(['respuestas'])
+    //  usar body completo en vez de only()
+    const data = request.body()
+
     const result = await this.service.guardarRespuestas(data, token)
     return response.json(result)
   }
