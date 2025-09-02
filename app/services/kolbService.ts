@@ -27,11 +27,12 @@ export default class KolbService {
         return { error: 'No autorizado' }
       }
 
-      // corregido: usar el mismo campo que viene en el JWT ("id_usuario")
+      // Usar el mismo campo que viene en el JWT
       const id_usuario = payload.id_usuario
       const { respuestas } = data
 
-      if (!respuestas || !Array.isArray(respuestas)) {
+      // Validación fuerte de respuestas
+      if (!respuestas || !Array.isArray(respuestas) || respuestas.length === 0) {
         return { error: 'Respuestas inválidas' }
       }
 
@@ -56,13 +57,15 @@ export default class KolbService {
         const pregunta = await PreguntaEstiloAprendizajes.find(id_pregunta)
         if (!pregunta) continue
 
-        //  corregido: normalizar el tipo de pregunta
-        const estilo = mapEstilo[pregunta.tipo_pregunta.toUpperCase().trim()]
+        // Normalizar tipo_pregunta y evitar errores si es null
+        const tipo = (pregunta.tipo_pregunta || '').toUpperCase().trim()
+        const estilo = mapEstilo[tipo]
+
         if (estilo && typeof valor === 'number') {
           puntajes[estilo] += valor
         }
 
-        // corregido: validar que valor exista antes de guardar
+        // Guardar respuesta solo si el valor es válido
         if (valor !== undefined && typeof valor === 'number') {
           await ResultadoEstudiante.create({
             id_test_ea_por_estudiantes: test.id_test_ea_por_estudiantes,
@@ -121,7 +124,6 @@ export default class KolbService {
         return { error: 'No autorizado' }
       }
 
-      //  corregido: usar id_usuario del payload
       const id_usuario = payload.id_usuario
 
       const test = await TestPorEstudiantes.query()
