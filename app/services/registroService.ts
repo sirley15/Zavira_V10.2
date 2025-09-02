@@ -225,14 +225,29 @@ async registrarEstudiante(data: any, token: string) {
   }
 
   // Perfil (verifica token)
-  async perfilEstudiante(token: string) {
-    try {
-      const jwtcode = jwt.verify(token, SECRET)
-      return { mensaje: 'JWT válido', datos: jwtcode }
-    } catch (e) {
-      return { error: 'Token INVÁLIDO' }
+  // Perfil (verifica token estudiante)
+async perfilEstudiante(token: string) {
+  try {
+    const payload: any = jwt.verify(token, SECRET)
+
+    // validar que sea un estudiante (rol Usuario)
+    if (payload.rol !== 'Usuario') {
+      return { error: 'No autorizado, este token no es de estudiante' }
     }
+
+    return { 
+      mensaje: 'JWT válido', 
+      datos: {
+        id_usuario: payload.id,
+        documento: payload.documento,
+        rol: payload.rol,
+      }
+    }
+  } catch (e) {
+    return { error: 'Token INVÁLIDO o expirado' }
   }
+}
+
 
 }
   
