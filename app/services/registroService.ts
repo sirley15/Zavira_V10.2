@@ -43,7 +43,7 @@ export default class RegistroService {
         timestamp: Date.now(),
       },
       SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     )
 
     return {
@@ -71,7 +71,7 @@ export default class RegistroService {
     timestamp: Date.now(),
   },
   SECRET,
-  { expiresIn: '24h' }
+  { expiresIn: '7d' }
 )
 
     return {
@@ -164,7 +164,7 @@ async registrarEstudiante(data: any, token: string) {
         timestamp: Date.now(),
       },
       SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     )
 
     return {
@@ -198,7 +198,7 @@ async registrarEstudiante(data: any, token: string) {
         timestamp: Date.now(),
       },
       SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     )
 
     return {
