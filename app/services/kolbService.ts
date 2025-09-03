@@ -27,11 +27,9 @@ export default class KolbService {
         return { error: 'No autorizado' }
       }
 
-      // Usar el mismo campo que viene en el JWT
       const id_usuario = payload.id_usuario
       const { respuestas } = data
 
-      // Validación fuerte de respuestas
       if (!respuestas || !Array.isArray(respuestas) || respuestas.length === 0) {
         return { error: 'Respuestas inválidas' }
       }
@@ -53,11 +51,12 @@ export default class KolbService {
       }
 
       for (const respuesta of respuestas) {
-        const { id_pregunta, valor } = respuesta
-        const pregunta = await PreguntaEstiloAprendizajes.find(id_pregunta)
+        // 👇 ahora usamos el campo correcto
+        const { idPreguntaEstiloAprendizajes, valor } = respuesta
+
+        const pregunta = await PreguntaEstiloAprendizajes.find(idPreguntaEstiloAprendizajes)
         if (!pregunta) continue
 
-        // Normalizar tipo_pregunta y evitar errores si es null
         const tipo = (pregunta.tipo_pregunta || '').toUpperCase().trim()
         const estilo = mapEstilo[tipo]
 
@@ -65,11 +64,10 @@ export default class KolbService {
           puntajes[estilo] += valor
         }
 
-        // Guardar respuesta solo si el valor es válido
         if (valor !== undefined && typeof valor === 'number') {
           await ResultadoEstudiante.create({
             id_test_ea_por_estudiantes: test.id_test_ea_por_estudiantes,
-            id_pregunta_estilo_aprendizajes: id_pregunta,
+            id_pregunta_estilo_aprendizajes: idPreguntaEstiloAprendizajes,
             valor: String(valor),
           })
         }
